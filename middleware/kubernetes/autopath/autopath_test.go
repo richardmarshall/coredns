@@ -18,7 +18,7 @@ func TestSplitSearchPath(t *testing.T) {
 	}
 	zone := "interwebs.nets"
 	for _, c := range tests {
-		name, search, ok := splitSearch(zone, c.question, c.namespace)
+		name, search, ok := SplitSearch(zone, c.question, c.namespace)
 		if c.expectedName != name || c.expectedSearch != search || c.expectedOk != ok {
 			t.Errorf("Case %v: Expected name'%v', search:'%v', ok:'%v'. Got name:'%v', search:'%v', ok:'%v'.", c.question, c.expectedName, c.expectedSearch, c.expectedOk, name, search, ok)
 		}
