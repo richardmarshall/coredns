@@ -40,24 +40,11 @@ func NewWriter(w dns.ResponseWriter, r *dns.Msg) *Writer {
 
 // WriteMsg writes to client, unless response will be NXDOMAIN.
 func (apw *Writer) WriteMsg(res *dns.Msg) error {
-	return apw.overrideMsg(res, false)
-}
-
-// ForceWriteMsg forces the write to client regardless of response code.
-func (apw *Writer) ForceWriteMsg(res *dns.Msg) error {
-	return apw.overrideMsg(res, true)
-}
-
-// overrideMsg overrides rcode, reverts question, adds CNAME, and calls the
-// underlying ResponseWriter's WriteMsg method unless the write is deferred,
-// or force = true.
-func (apw *Writer) overrideMsg(res *dns.Msg, force bool) error {
 	if res.Rcode == dns.RcodeNameError {
+		println("SETTING RCODE from", res.Rcode, "to", apw.Rcode, res.Question[0].Name)
 		res.Rcode = apw.Rcode
 	}
-	if res.Rcode != dns.RcodeSuccess && !force {
-		return nil
-	}
+
 	for _, a := range res.Answer {
 		if apw.original.Name == a.Header().Name {
 			continue
@@ -67,6 +54,7 @@ func (apw *Writer) overrideMsg(res *dns.Msg, force bool) error {
 		res.Answer[0] = CNAME(apw.original.Name, a.Header().Name, a.Header().Ttl)
 	}
 	res.Question[0] = apw.original
+	println("SENDING")
 	apw.Sent = true
 	return apw.ResponseWriter.WriteMsg(res)
 }
