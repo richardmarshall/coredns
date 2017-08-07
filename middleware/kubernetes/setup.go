@@ -134,8 +134,21 @@ func kubernetesParse(c *caddy.Controller) (*Kubernetes, error) {
 						continue
 					}
 					return nil, c.ArgErr()
+				case "token":
+					args := c.RemainingArgs()
+					if len(k8s.APIClientCert) > 0 {
+						return nil, fmt.Errorf("cannot specify both tls and token authentication")
+					}
+					if len(args) == 1 {
+						k8s.APITokenFile = args[0]
+						continue
+					}
+					return nil, c.ArgErr()
 				case "tls": // cert key cacertfile
 					args := c.RemainingArgs()
+					if len(k8s.APIToken) > 0 {
+						return nil, fmt.Errorf("cannot specify both tls and token authentication")
+					}
 					if len(args) == 3 {
 						k8s.APIClientCert, k8s.APIClientKey, k8s.APICertAuth = args[0], args[1], args[2]
 						continue

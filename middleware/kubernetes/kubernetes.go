@@ -37,6 +37,7 @@ type Kubernetes struct {
 	APICertAuth   string
 	APIClientCert string
 	APIClientKey  string
+	APITokenFile  string
 	APIConn       dnsController
 	ResyncPeriod  time.Duration
 	Namespaces    []string
@@ -209,6 +210,9 @@ func (k *Kubernetes) getClientConfig() (*rest.Config, error) {
 			return nil, err
 		}
 		return cc, err
+	}
+	if len(k.APITokenFile) > 0 {
+		authinfo.TokenFile = k.APITokenFile
 	}
 	if len(k.APICertAuth) > 0 {
 		clusterinfo.CertificateAuthority = k.APICertAuth

@@ -9,8 +9,9 @@ CoreDNS running the kubernetes middleware can be used as a replacement of kube-d
 ```
 kubernetes ZONE [ZONE...] [{
 	[resyncperiod DURATION]
-	[endpoint URL
-	[tls CERT KEY CACERT]]
+	[endpoint URL]
+	[tls CERT KEY [CACERT]]
+	[token TOKENFILE]
 	[namespaces NAMESPACE [NAMESPACE...]]
 	[labels EXPRESSION]
 	[pods POD-MODE]
@@ -57,6 +58,19 @@ specified).
 	kubernetes cluster.local. {
 		endpoint https://k8s-endpoint:8443
 		tls cert key cacert
+	}
+  ```
+
+* `token` **TOKENFILE**
+
+  Use **TOKENFILE** to load a file with a bearer token to be used for authentication. This option is ignored if connecting in-cluster (i.e. endpoint is not specified).
+
+  Example:
+
+  ```
+	kubernetes cluster.local. {
+		endpoint https://k8s-endpoint:8443
+		token tokenfile
 	}
   ```
 
