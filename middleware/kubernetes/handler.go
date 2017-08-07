@@ -39,13 +39,15 @@ func (k Kubernetes) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.M
 		// Set the zone to this specific request.
 		zone = state.Name()
 	}
+
 	records, extra, _, err := k.routeRequest(zone, state)
 
 	// Check for Autopath search eligibility
 	if (k.autoPath != nil) && k.IsNameError(err) && (state.QType() == dns.TypeA || state.QType() == dns.TypeAAAA) {
 		p := k.findPodWithIP(state.IP())
+
 		for p != nil {
-			name, path, ok := splitSearch(zone, state.QName(), p.Namespace)
+			name, path, ok := autopath.SplitSearch(zone, state.QName(), p.Namespace)
 			if !ok {
 				break
 			}

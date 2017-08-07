@@ -1,6 +1,10 @@
 package autopath
 
-import "github.com/miekg/dns"
+import (
+	"strings"
+
+	"github.com/miekg/dns"
+)
 
 // Writer implements a ResponseWriter that also does the following:
 // * reverts question section of a packet to its original state.
@@ -65,9 +69,10 @@ func (apw *Writer) Write(buf []byte) (int, error) {
 	return n, err
 }
 
-// Hijack implements dns.Hijacker. It simply wraps the underlying
-// ResponseWriter's Hijack method if there is one, or returns an error.
-func (apw *Writer) Hijack() {
-	apw.ResponseWriter.Hijack()
-	return
+func SplitSearch(zone, question, namespace string) (name, search string, ok bool) {
+	search = strings.Join([]string{namespace, "svc", zone}, ".")
+	if dns.IsSubDomain(search, question) {
+		return question[:len(question)-len(search)-1], search, true
+	}
+	return "", "", false
 }
