@@ -45,7 +45,6 @@ func NewWriter(w dns.ResponseWriter, r *dns.Msg) *Writer {
 // WriteMsg writes to client, unless response will be NXDOMAIN.
 func (apw *Writer) WriteMsg(res *dns.Msg) error {
 	if res.Rcode == dns.RcodeNameError {
-		println("SETTING RCODE from", res.Rcode, "to", apw.Rcode, res.Question[0].Name)
 		res.Rcode = apw.Rcode
 	}
 
@@ -58,7 +57,6 @@ func (apw *Writer) WriteMsg(res *dns.Msg) error {
 		res.Answer[0] = CNAME(apw.original.Name, a.Header().Name, a.Header().Ttl)
 	}
 	res.Question[0] = apw.original
-	println("SENDING")
 	apw.Sent = true
 	return apw.ResponseWriter.WriteMsg(res)
 }
